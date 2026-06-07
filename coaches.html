@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FixMyElo — Find a Coach</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#7C5CBF;--purple-light:#9B7FD4;--blue:#4A90E2;
+  --cyan:#00D4FF;--gold:#FFB800;--pink:#FF6B9D;--green:#00C896;
+  --red:#FF6B6B;--bg:#0D0D1A;--bg2:#12122A;--bg3:#1A1A35;
+  --card:#1E1E38;--border:rgba(255,255,255,0.08);
+  --text:#FFFFFF;--muted:#8888AA;--font:'Nunito',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;background:rgba(13,13,26,0.95);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:0.75rem}
+.logo{font-weight:900;font-size:1.4rem;background:linear-gradient(135deg,var(--cyan),var(--purple-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none}
+.logo em{font-style:normal;background:linear-gradient(135deg,var(--gold),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:1rem;align-items:center}
+.nav-link{text-decoration:none;color:var(--muted);font-size:0.88rem;font-weight:700;transition:color 0.2s}
+.nav-link:hover{color:var(--text)}
+.nav-btn{background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff;padding:0.45rem 1.1rem;border-radius:50px;font-weight:800;font-size:0.85rem;text-decoration:none;border:none;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 15px rgba(124,92,191,0.35)}
+.nav-btn:hover{transform:translateY(-2px)}
+
+/* HERO */
+.hero{padding:5rem 2rem 3rem;text-align:center;background:linear-gradient(180deg,rgba(124,92,191,0.08) 0%,transparent 100%);border-bottom:1px solid var(--border)}
+.hero-tag{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(255,184,0,0.1);border:1.5px solid rgba(255,184,0,0.3);color:var(--gold);font-size:0.78rem;font-weight:800;padding:0.35rem 0.9rem;border-radius:50px;margin-bottom:1.25rem}
+.hero h1{font-weight:900;font-size:clamp(2rem,5vw,3.5rem);letter-spacing:-1px;margin-bottom:0.75rem;line-height:1.1}
+.hero h1 span{background:linear-gradient(135deg,var(--cyan),var(--purple-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--muted);font-size:1rem;max-width:520px;margin:0 auto 2rem;font-weight:500;line-height:1.7}
+.become-btn{display:inline-flex;align-items:center;gap:0.5rem;background:linear-gradient(135deg,var(--gold),var(--gold2:#FF9500));color:#000;font-family:var(--font);font-size:0.95rem;font-weight:900;padding:0.75rem 2rem;border-radius:50px;cursor:pointer;border:none;box-shadow:0 4px 20px rgba(255,184,0,0.35);transition:all 0.2s;text-decoration:none}
+.become-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(255,184,0,0.45)}
+
+/* STATS */
+.stats-row{display:flex;justify-content:center;gap:3rem;padding:1.5rem 2rem;flex-wrap:wrap}
+.stt{text-align:center}
+.stt-num{font-weight:900;font-size:1.6rem;background:linear-gradient(135deg,var(--cyan),var(--purple-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:block}
+.stt-label{font-size:0.75rem;color:var(--muted);font-weight:600}
+
+/* FILTERS */
+.filters{max-width:1100px;margin:0 auto;padding:2rem 2rem 1rem;display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center}
+.filter-label{font-size:0.82rem;font-weight:700;color:var(--muted);margin-right:0.25rem}
+.fbtn{background:var(--card);border:2px solid var(--border);color:var(--muted);font-family:var(--font);font-size:0.82rem;font-weight:700;padding:0.4rem 1rem;border-radius:50px;cursor:pointer;transition:all 0.2s}
+.fbtn:hover,.fbtn.active{background:rgba(124,92,191,0.15);border-color:var(--purple-light);color:var(--text)}
+.fbtn.gold-filter.active{background:rgba(255,184,0,0.1);border-color:var(--gold);color:var(--gold)}
+
+/* GRID */
+.coaches-grid{max-width:1100px;margin:0 auto;padding:1rem 2rem 4rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.25rem}
+
+/* COACH CARD */
+.ccard{
+  background:var(--card);border:2px solid var(--border);
+  border-radius:20px;padding:1.5rem;
+  transition:transform 0.25s,border-color 0.25s,box-shadow 0.25s;
+  position:relative;overflow:hidden;
+}
+.ccard:hover{transform:translateY(-5px);border-color:rgba(124,92,191,0.4);box-shadow:0 12px 30px rgba(0,0,0,0.3)}
+.ccard.featured{border-color:rgba(255,184,0,0.4);background:linear-gradient(160deg,rgba(255,184,0,0.05),var(--card))}
+.featured-ribbon{position:absolute;top:0;right:0;background:linear-gradient(135deg,var(--gold),#FF9500);color:#000;font-size:0.65rem;font-weight:900;padding:0.3rem 0.85rem;border-radius:0 18px 0 12px;letter-spacing:1px}
+
+/* CARD HEADER */
+.card-top{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.25rem}
+.coach-av{
+  width:54px;height:54px;border-radius:14px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:1.2rem;color:#fff;
+  position:relative;
+}
+.online-dot{position:absolute;bottom:-2px;right:-2px;width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid var(--card)}
+.coach-name{font-size:1rem;font-weight:900;color:var(--text);margin-bottom:0.2rem}
+.coach-role{font-size:0.78rem;color:var(--muted);font-weight:600;margin-bottom:0.4rem}
+.rank-pill{display:inline-flex;align-items:center;gap:0.3rem;font-size:0.72rem;font-weight:800;padding:0.2rem 0.6rem;border-radius:50px}
+.rank-diamond{background:rgba(100,200,255,0.1);color:#64C8FF;border:1px solid rgba(100,200,255,0.3)}
+.rank-master{background:rgba(155,100,255,0.1);color:#9B64FF;border:1px solid rgba(155,100,255,0.3)}
+.rank-grandmaster{background:rgba(255,100,100,0.1);color:#FF6464;border:1px solid rgba(255,100,100,0.3)}
+.rank-challenger{background:rgba(255,184,0,0.1);color:var(--gold);border:1px solid rgba(255,184,0,0.3)}
+
+/* STATS ROW */
+.coach-stats{display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap}
+.cs{background:var(--bg3);border-radius:8px;padding:0.4rem 0.7rem;text-align:center;flex:1;min-width:60px}
+.cs-val{font-size:0.88rem;font-weight:900;color:var(--text);display:block}
+.cs-label{font-size:0.62rem;color:var(--muted);font-weight:600}
+
+/* SPECIALTIES */
+.specialties{display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:1rem}
+.spec{background:rgba(124,92,191,0.1);border:1px solid rgba(124,92,191,0.2);color:var(--purple-light);font-size:0.7rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:50px}
+
+/* REVIEWS */
+.reviews-row{display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem}
+.stars{color:var(--gold);font-size:0.8rem;letter-spacing:1px}
+.review-count{font-size:0.78rem;color:var(--muted);font-weight:600}
+.review-preview{font-size:0.78rem;color:var(--muted);font-style:italic;margin-bottom:1rem;line-height:1.5;border-left:2px solid var(--border);padding-left:0.75rem}
+
+/* PRICE & BOOK */
+.card-bottom{display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap}
+.price-block .price{font-size:1.4rem;font-weight:900;color:var(--text)}
+.price-block .per{font-size:0.78rem;color:var(--muted);font-weight:600}
+.price-block .commission{font-size:0.68rem;color:var(--green);font-weight:700;margin-top:1px}
+.book-btn{background:linear-gradient(135deg,var(--purple),var(--blue));border:none;color:#fff;font-family:var(--font);font-size:0.88rem;font-weight:800;padding:0.6rem 1.4rem;border-radius:50px;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 12px rgba(124,92,191,0.3)}
+.book-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(124,92,191,0.45)}
+
+/* MODAL OVERLAY */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:2px solid var(--border);border-radius:24px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;padding:2rem;position:relative}
+.modal-close{position:absolute;top:1rem;right:1rem;background:var(--bg3);border:none;color:var(--muted);font-size:1.2rem;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+.modal-close:hover{color:var(--text);background:var(--card)}
+.modal h2{font-size:1.3rem;font-weight:900;margin-bottom:0.4rem}
+.modal-sub{font-size:0.88rem;color:var(--muted);font-weight:500;margin-bottom:1.5rem;line-height:1.6}
+.form-group{margin-bottom:1rem}
+.form-label{font-size:0.82rem;font-weight:800;color:var(--text);margin-bottom:0.4rem;display:block}
+.form-inp{width:100%;background:var(--bg3);border:2px solid var(--border);border-radius:12px;color:var(--text);font-family:var(--font);font-size:0.92rem;font-weight:500;padding:0.75rem 1rem;outline:none;transition:border-color 0.2s}
+.form-inp:focus{border-color:var(--purple-light)}
+.form-inp::placeholder{color:var(--muted)}
+select.form-inp{cursor:pointer}
+.time-slots{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-top:0.5rem}
+.slot{background:var(--bg3);border:2px solid var(--border);border-radius:10px;padding:0.5rem;text-align:center;font-size:0.8rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.2s}
+.slot:hover,.slot.selected{background:rgba(124,92,191,0.15);border-color:var(--purple-light);color:var(--text)}
+.slot.taken{opacity:0.35;cursor:not-allowed;background:var(--bg3)}
+.price-summary{background:var(--bg3);border:2px solid var(--border);border-radius:14px;padding:1rem 1.25rem;margin:1.25rem 0}
+.ps-row{display:flex;justify-content:space-between;font-size:0.85rem;padding:0.3rem 0}
+.ps-row.total{border-top:1px solid var(--border);margin-top:0.4rem;padding-top:0.6rem;font-weight:900;font-size:1rem}
+.ps-label{color:var(--muted);font-weight:600}
+.ps-val{color:var(--text);font-weight:700}
+.ps-val.green{color:var(--green)}
+.book-confirm-btn{width:100%;background:linear-gradient(135deg,var(--purple),var(--blue));border:none;color:#fff;font-family:var(--font);font-size:1rem;font-weight:800;padding:0.85rem;border-radius:14px;cursor:pointer;box-shadow:0 4px 20px rgba(124,92,191,0.4);transition:all 0.2s;margin-top:0.5rem}
+.book-confirm-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(124,92,191,0.5)}
+
+/* APPLY SECTION */
+.apply-section{background:linear-gradient(135deg,rgba(255,184,0,0.08),rgba(124,92,191,0.06));border-top:2px solid rgba(255,184,0,0.15);border-bottom:2px solid rgba(255,184,0,0.15);padding:4rem 2rem;text-align:center}
+.apply-inner{max-width:700px;margin:0 auto}
+.apply-emoji{font-size:3rem;display:block;margin-bottom:1rem}
+.apply-section h2{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:900;margin-bottom:0.75rem;letter-spacing:-0.5px}
+.apply-section h2 span{background:linear-gradient(135deg,var(--gold),#FF9500);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.apply-section p{color:var(--muted);font-size:0.95rem;max-width:480px;margin:0 auto 2rem;font-weight:500;line-height:1.7}
+.perks{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:2rem}
+.perk{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:0.75rem 1.1rem;font-size:0.85rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:0.5rem}
+.apply-btn{display:inline-flex;align-items:center;gap:0.5rem;background:linear-gradient(135deg,var(--gold),#FF9500);color:#000;font-family:var(--font);font-size:1rem;font-weight:900;padding:0.85rem 2.5rem;border-radius:50px;cursor:pointer;border:none;box-shadow:0 4px 20px rgba(255,184,0,0.35);transition:all 0.2s}
+.apply-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(255,184,0,0.5)}
+
+/* APPLY MODAL */
+.apply-modal{max-width:580px}
+.rank-options{display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem;margin-top:0.5rem}
+.rank-opt{background:var(--bg3);border:2px solid var(--border);border-radius:10px;padding:0.6rem 0.75rem;font-size:0.82rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.2s;text-align:center}
+.rank-opt:hover,.rank-opt.selected{border-color:var(--purple-light);color:var(--text);background:rgba(124,92,191,0.1)}
+.success-screen{display:none;text-align:center;padding:2rem 0}
+.success-emoji{font-size:3.5rem;display:block;margin-bottom:1rem}
+.success-title{font-size:1.4rem;font-weight:900;margin-bottom:0.5rem}
+.success-sub{font-size:0.92rem;color:var(--muted);font-weight:500;line-height:1.7}
+
+/* FOOTER */
+footer{padding:2rem 2.5rem;background:var(--bg);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.fl{font-weight:900;font-size:1rem;background:linear-gradient(135deg,var(--cyan),var(--purple-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.fn{font-size:0.72rem;color:var(--muted);font-weight:500}
+
+@media(max-width:600px){
+  nav{padding:1rem 1.25rem}
+  .coaches-grid{grid-template-columns:1fr;padding:1rem}
+  .filters{padding:1.5rem 1rem 0.5rem}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="logo">Fix<em>My</em>Elo</a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="analyze.html" class="nav-link">AI Report</a>
+    <a href="coaches.html" class="nav-link" style="color:var(--text)">Find a Coach</a>
+    <button class="nav-btn" onclick="openApplyModal()">Become a Coach 🏆</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">🏆 Diamond+ Verified Coaches</div>
+  <h1>Get coached by <span>real high-elo players</span> 👑</h1>
+  <p>Every coach on FixMyElo is Diamond or above, verified by us, and rated by real students. Book a session and actually climb this season. 🚀</p>
+  <button class="become-btn" onclick="openApplyModal()">💰 Become a Coach — Earn Money Playing LoL</button>
+</div>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stt"><span class="stt-num">47</span><span class="stt-label">Active Coaches</span></div>
+  <div class="stt"><span class="stt-num">1,200+</span><span class="stt-label">Sessions Completed</span></div>
+  <div class="stt"><span class="stt-num">4.8 ⭐</span><span class="stt-label">Avg Coach Rating</span></div>
+  <div class="stt"><span class="stt-num">+2.1 Divs</span><span class="stt-label">Avg Student Improvement</span></div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters">
+  <span class="filter-label">Filter:</span>
+  <button class="fbtn active" onclick="filterCoaches('all',this)">All Ranks</button>
+  <button class="fbtn" onclick="filterCoaches('diamond',this)">💎 Diamond</button>
+  <button class="fbtn" onclick="filterCoaches('master',this)">🔮 Master</button>
+  <button class="fbtn" onclick="filterCoaches('grandmaster',this)">🔴 Grandmaster</button>
+  <button class="fbtn gold-filter" onclick="filterCoaches('challenger',this)">🏆 Challenger</button>
+</div>
+
+<!-- COACHES GRID -->
+<div class="coaches-grid" id="coachesGrid"></div>
+
+<!-- APPLY SECTION -->
+<div class="apply-section">
+  <div class="apply-inner">
+    <span class="apply-emoji">💰</span>
+    <h2>Diamond+? <span>Get paid to play.</span></h2>
+    <p>Join FixMyElo as a coach and earn money doing what you love. Set your own rates, your own schedule — we handle the platform, payments, and marketing.</p>
+    <div class="perks">
+      <div class="perk">💸 Keep 80-85% of earnings</div>
+      <div class="perk">⏰ Set your own schedule</div>
+      <div class="perk">📈 Higher rank = higher rates</div>
+      <div class="perk">🌍 Coach players worldwide</div>
+      <div class="perk">⭐ Build your reputation</div>
+    </div>
+    <button class="apply-btn" onclick="openApplyModal()">Apply to Coach →</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="fl">FixMyElo</div>
+  <div class="fn">Not affiliated with Riot Games · All rights reserved</div>
+  <div class="fn">© 2026 FixMyElo.com</div>
+</footer>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('bookingModal')">✕</button>
+    <h2 id="modal-coach-name">Book a Session</h2>
+    <p class="modal-sub" id="modal-coach-info">Fill in your details and pick a time slot 👇</p>
+
+    <div class="form-group">
+      <label class="form-label">Your Summoner Name</label>
+      <input class="form-inp" type="text" placeholder="e.g. Faker9000" id="book-summoner"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Your Region</label>
+      <select class="form-inp" id="book-region">
+        <option>EUW</option><option>EUNE</option><option>NA</option><option>KR</option><option>BR</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Session Type</label>
+      <select class="form-inp" id="book-type">
+        <option>VOD Review (coach watches your replay)</option>
+        <option>Live Game Review (coach watches you play)</option>
+        <option>1-on-1 Coaching Call</option>
+        <option>Full Analysis + Fix Plan</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Your Main Issue (optional)</label>
+      <input class="form-inp" type="text" placeholder="e.g. I keep dying early game..." id="book-issue"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Pick a Time Slot</label>
+      <div class="time-slots" id="timeSlots"></div>
+    </div>
+
+    <div class="price-summary" id="priceSummary">
+      <div class="ps-row"><span class="ps-label">Session Fee</span><span class="ps-val" id="ps-fee">€0</span></div>
+      <div class="ps-row"><span class="ps-label">Platform Fee (10%)</span><span class="ps-val" id="ps-platform">€0</span></div>
+      <div class="ps-row total"><span class="ps-label">Total</span><span class="ps-val" id="ps-total">€0</span></div>
+    </div>
+
+    <button class="book-confirm-btn" onclick="confirmBooking()">Confirm Booking 🚀</button>
+
+    <div class="success-screen" id="bookingSuccess">
+      <span class="success-emoji">🎉</span>
+      <div class="success-title">Booking Confirmed!</div>
+      <div class="success-sub">Your coach will contact you within 2 hours to confirm the session. Check your email! 📧<br/><br/>Get ready to climb! 📈</div>
+    </div>
+  </div>
+</div>
+
+<!-- APPLY MODAL -->
+<div class="modal-overlay" id="applyModal">
+  <div class="modal apply-modal">
+    <button class="modal-close" onclick="closeModal('applyModal')">✕</button>
+
+    <div id="applyForm">
+      <h2>Apply to Coach 🏆</h2>
+      <p class="modal-sub">Join our coaching roster and start earning. We review all applications within 48 hours.</p>
+
+      <div class="form-group">
+        <label class="form-label">Your Summoner Name</label>
+        <input class="form-inp" type="text" placeholder="Your in-game name" id="apply-summoner"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Region</label>
+        <select class="form-inp" id="apply-region">
+          <option>EUW</option><option>EUNE</option><option>NA</option><option>KR</option><option>BR</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Current Rank</label>
+        <div class="rank-options">
+          <div class="rank-opt" onclick="selectRank(this,'Diamond')">💎 Diamond</div>
+          <div class="rank-opt" onclick="selectRank(this,'Master')">🔮 Master</div>
+          <div class="rank-opt" onclick="selectRank(this,'Grandmaster')">🔴 Grandmaster</div>
+          <div class="rank-opt" onclick="selectRank(this,'Challenger')">🏆 Challenger</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Main Role(s)</label>
+        <input class="form-inp" type="text" placeholder="e.g. Mid, Support" id="apply-role"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Hourly Rate (€)</label>
+        <select class="form-inp" id="apply-rate">
+          <option>€10/hr (Diamond)</option>
+          <option>€15/hr (Diamond+)</option>
+          <option>€20/hr (Master)</option>
+          <option>€30/hr (Grandmaster)</option>
+          <option>€50/hr (Challenger)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Discord Username</label>
+        <input class="form-inp" type="text" placeholder="username#0000" id="apply-discord"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-inp" type="email" placeholder="your@email.com" id="apply-email"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Why would you be a great coach? (optional)</label>
+        <textarea class="form-inp" rows="3" placeholder="Tell us about your coaching style..." id="apply-bio" style="resize:vertical"></textarea>
+      </div>
+
+      <div style="background:rgba(255,184,0,0.06);border:1.5px solid rgba(255,184,0,0.2);border-radius:12px;padding:0.85rem 1rem;margin-bottom:1.25rem;font-size:0.82rem;color:var(--muted);font-weight:500;line-height:1.6">
+        💰 <strong style="color:var(--gold)">Revenue split:</strong> You keep <strong style="color:var(--text)">80–85%</strong> of every session. We take 15–20% as a platform fee. Payments sent weekly via PayPal or bank transfer.
+      </div>
+
+      <button class="book-confirm-btn" style="background:linear-gradient(135deg,var(--gold),#FF9500)" onclick="submitApplication()">Submit Application 🚀</button>
+    </div>
+
+    <div class="success-screen" id="applySuccess">
+      <span class="success-emoji">🙌</span>
+      <div class="success-title">Application Received!</div>
+      <div class="success-sub">We'll review your application and get back to you within 48 hours via email.<br/><br/>Get ready to start earning! 💰</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── COACH DATA ──
+const COACHES = [
+  {id:1,name:'ProLaner99',initials:'PL',role:'Mid Lane',rank:'challenger',rankLabel:'Challenger',rankClass:'rank-challenger',color:'linear-gradient(135deg,#FFB800,#FF6B00)',sessions:143,rating:4.9,reviews:89,winRate:'68%',price:50,specialties:['Mid Lane','Assassins','Wave Control'],bio:'"Fixed my CS in one session and jumped 2 divisions instantly 🔥"',featured:true,online:true},
+  {id:2,name:'VoidWalker',initials:'VW',role:'Jungle',rank:'grandmaster',rankLabel:'Grandmaster',rankClass:'rank-grandmaster',color:'linear-gradient(135deg,#FF6464,#B00)',sessions:97,rating:4.8,reviews:61,winRate:'65%',price:30,specialties:['Jungle','Early Pathing','Macro'],bio:'"He actually explained WHY I was losing. Game-changer 💯"',featured:true,online:true},
+  {id:3,name:'SupportGod',initials:'SG',role:'Support',rank:'master',rankLabel:'Master',rankClass:'rank-master',color:'linear-gradient(135deg,#9B64FF,#5B3BAB)',sessions:78,rating:4.9,reviews:54,winRate:'63%',price:20,specialties:['Support','Vision Control','Roaming'],bio:'"Best support coach I\'ve found — super detailed and patient 🙏"',featured:false,online:false},
+  {id:4,name:'ADCKing',initials:'AK',role:'Bot Lane',rank:'diamond',rankLabel:'Diamond',rankClass:'rank-diamond',color:'linear-gradient(135deg,#64C8FF,#2080B0)',sessions:52,rating:4.7,reviews:38,winRate:'61%',price:12,specialties:['ADC','Positioning','Kiting'],bio:'"Went from Silver to Gold in 3 weeks after 2 sessions. Worth it 🏆"',featured:false,online:true},
+  {id:5,name:'TopGapper',initials:'TG',role:'Top Lane',rank:'master',rankLabel:'Master',rankClass:'rank-master',color:'linear-gradient(135deg,#9B64FF,#5B3BAB)',sessions:66,rating:4.8,reviews:43,winRate:'64%',price:22,specialties:['Top Lane','Split Push','Tanks'],bio:'"Incredibly knowledgeable about top lane macro. Highly recommend 🔥"',featured:false,online:true},
+  {id:6,name:'MidOrFeed',initials:'MF',role:'Mid Lane',rank:'grandmaster',rankLabel:'Grandmaster',rankClass:'rank-grandmaster',color:'linear-gradient(135deg,#FF6464,#B00)',sessions:88,rating:4.7,reviews:57,winRate:'66%',price:35,specialties:['Mid Lane','Roaming','AP Carries'],bio:'"Fixed my terrible roaming habits in literally one session 😭"',featured:false,online:false},
+];
+
+let selectedCoach = null;
+let selectedSlot = null;
+let selectedRankVal = '';
+
+function renderCoaches(filter='all'){
+  const grid = document.getElementById('coachesGrid');
+  const filtered = filter==='all' ? COACHES : COACHES.filter(c=>c.rank===filter);
+  grid.innerHTML = filtered.map(c=>`
+  <div class="ccard ${c.featured?'featured':''}" data-rank="${c.rank}">
+    ${c.featured?'<div class="featured-ribbon">⭐ TOP COACH</div>':''}
+    <div class="card-top">
+      <div class="coach-av" style="background:${c.color}">
+        ${c.initials}
+        ${c.online?'<div class="online-dot"></div>':''}
+      </div>
+      <div style="flex:1">
+        <div class="coach-name">${c.name}</div>
+        <div class="coach-role">${c.role}</div>
+        <span class="rank-pill ${c.rankClass}">${c.rankLabel}</span>
+      </div>
+    </div>
+    <div class="coach-stats">
+      <div class="cs"><span class="cs-val">${c.rating}⭐</span><span class="cs-label">Rating</span></div>
+      <div class="cs"><span class="cs-val">${c.sessions}</span><span class="cs-label">Sessions</span></div>
+      <div class="cs"><span class="cs-val">${c.winRate}</span><span class="cs-label">Win Rate</span></div>
+    </div>
+    <div class="specialties">
+      ${c.specialties.map(s=>`<span class="spec">${s}</span>`).join('')}
+    </div>
+    <div class="reviews-row">
+      <span class="stars">${'★'.repeat(Math.floor(c.rating))}${'☆'.repeat(5-Math.floor(c.rating))}</span>
+      <span class="review-count">(${c.reviews} reviews)</span>
+      ${c.online?'<span style="background:rgba(0,200,150,0.1);color:var(--green);font-size:0.68rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:50px;margin-left:auto">● Online</span>':''}
+    </div>
+    <div class="review-preview">${c.bio}</div>
+    <div class="card-bottom">
+      <div class="price-block">
+        <span class="price">€${c.price}</span><span class="per">/hour</span>
+        <div class="commission">Coach earns €${Math.round(c.price*0.82)}/hr</div>
+      </div>
+      <button class="book-btn" onclick="openBooking(${c.id})">Book Session 🎮</button>
+    </div>
+  </div>`).join('');
+}
+
+function filterCoaches(rank, btn){
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCoaches(rank);
+}
+
+// ── BOOKING ──
+function openBooking(coachId){
+  selectedCoach = COACHES.find(c=>c.id===coachId);
+  selectedSlot = null;
+  document.getElementById('modal-coach-name').textContent = `Book with ${selectedCoach.name} 🎮`;
+  document.getElementById('modal-coach-info').textContent = `${selectedCoach.rankLabel} ${selectedCoach.role} · €${selectedCoach.price}/hr · ${selectedCoach.rating}⭐`;
+  updatePriceSummary();
+  renderTimeSlots();
+  document.getElementById('bookingSuccess').style.display='none';
+  document.getElementById('bookingModal').querySelector('.modal').querySelectorAll('.form-group,.price-summary,.book-confirm-btn').forEach(el=>el.style.display='');
+  document.getElementById('bookingModal').classList.add('open');
+}
+
+function renderTimeSlots(){
+  const slots = ['Today 6PM','Today 8PM','Today 10PM','Tomorrow 10AM','Tomorrow 2PM','Tomorrow 6PM','Sat 10AM','Sat 3PM','Sun 12PM'];
+  const taken = [2,5];
+  document.getElementById('timeSlots').innerHTML = slots.map((s,i)=>`
+    <div class="slot ${taken.includes(i)?'taken':''}" onclick="${taken.includes(i)?'':`selectSlot(this,'${s}')`}">${taken.includes(i)?'🚫 ':''} ${s}</div>
+  `).join('');
+}
+
+function selectSlot(el, slot){
+  document.querySelectorAll('.slot').forEach(s=>s.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSlot = slot;
+}
+
+function updatePriceSummary(){
+  if(!selectedCoach) return;
+  const fee = selectedCoach.price;
+  const platform = Math.round(fee*0.1);
+  const total = fee + platform;
+  document.getElementById('ps-fee').textContent = `€${fee}`;
+  document.getElementById('ps-platform').textContent = `€${platform}`;
+  document.getElementById('ps-total').textContent = `€${total}`;
+}
+
+function confirmBooking(){
+  const summoner = document.getElementById('book-summoner').value.trim();
+  if(!summoner){ alert('Please enter your Summoner Name! 👀'); return; }
+  if(!selectedSlot){ alert('Please pick a time slot! 📅'); return; }
+  document.getElementById('bookingModal').querySelectorAll('.form-group,.price-summary,.book-confirm-btn').forEach(el=>el.style.display='none');
+  document.getElementById('bookingSuccess').style.display='block';
+}
+
+// ── APPLY ──
+function openApplyModal(){
+  document.getElementById('applyForm').style.display='block';
+  document.getElementById('applySuccess').style.display='none';
+  document.getElementById('applyModal').classList.add('open');
+}
+
+function selectRank(el, rank){
+  document.querySelectorAll('.rank-opt').forEach(r=>r.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedRankVal = rank;
+}
+
+function submitApplication(){
+  const summoner = document.getElementById('apply-summoner').value.trim();
+  const email = document.getElementById('apply-email').value.trim();
+  if(!summoner){ alert('Please enter your Summoner Name! 👀'); return; }
+  if(!selectedRankVal){ alert('Please select your rank! 🏆'); return; }
+  if(!email){ alert('Please enter your email! 📧'); return; }
+  document.getElementById('applyForm').style.display='none';
+  document.getElementById('applySuccess').style.display='block';
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+}
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay=>{
+  overlay.addEventListener('click',e=>{
+    if(e.target===overlay) overlay.classList.remove('open');
+  });
+});
+
+// Init
+renderCoaches();
+</script>
+</body>
+</html>
