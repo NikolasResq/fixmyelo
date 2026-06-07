@@ -1,7 +1,5 @@
 {
-  "functions": {
-    "api/analyze.js": {
-      "runtime": "edge"
-    }
-  }
+  "rewrites": [
+    { "source": "/api/analyze", "destination": "/api/analyze.js" }
+  ]
 }
