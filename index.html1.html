@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FixMyElo — Find Your Bad Habit. Fix It. Climb.</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --purple:#7C5CBF;
+  --purple-light:#9B7FD4;
+  --blue:#4A90E2;
+  --cyan:#00D4FF;
+  --gold:#FFB800;
+  --gold2:#FF9500;
+  --pink:#FF6B9D;
+  --green:#00C896;
+  --bg:#0D0D1A;
+  --bg2:#12122A;
+  --bg3:#1A1A35;
+  --card:#1E1E38;
+  --border:rgba(255,255,255,0.08);
+  --text:#FFFFFF;
+  --muted:#8888AA;
+  --font:'Nunito',sans-serif;
+  --font2:'Space Grotesk',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.6;overflow-x:hidden}
+
+canvas#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 2.5rem;
+  background:rgba(13,13,26,0.85);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.logo{
+  font-family:var(--font);font-weight:900;font-size:1.6rem;
+  background:linear-gradient(135deg,var(--cyan),var(--purple-light));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-0.5px;
+}
+.logo em{font-style:normal;background:linear-gradient(135deg,var(--gold),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+nav ul{display:flex;gap:1.75rem;list-style:none;align-items:center}
+nav ul a{text-decoration:none;color:var(--muted);font-size:0.9rem;font-weight:600;transition:color 0.2s}
+nav ul a:hover{color:var(--text)}
+.nav-btn{
+  background:linear-gradient(135deg,var(--purple),var(--blue));
+  color:#fff!important;padding:0.5rem 1.25rem;
+  border-radius:50px;font-weight:700!important;font-size:0.85rem!important;
+  transition:transform 0.2s,box-shadow 0.2s!important;
+  box-shadow:0 4px 15px rgba(124,92,191,0.4);
+}
+.nav-btn:hover{transform:translateY(-2px)!important;box-shadow:0 6px 20px rgba(124,92,191,0.5)!important}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:8rem 2rem 5rem;
+  position:relative;z-index:1;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  background:rgba(0,212,255,0.1);border:1.5px solid rgba(0,212,255,0.3);
+  color:var(--cyan);font-size:0.8rem;font-weight:700;letter-spacing:0.5px;
+  padding:0.4rem 1rem;border-radius:50px;margin-bottom:2rem;
+}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+
+h1{
+  font-family:var(--font);font-weight:900;
+  font-size:clamp(3.5rem,9vw,7rem);
+  line-height:1.05;letter-spacing:-2px;
+  margin-bottom:1rem;
+}
+.h1-fix{color:#fff}
+.h1-my{background:linear-gradient(135deg,var(--gold),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.h1-elo{background:linear-gradient(135deg,var(--cyan),var(--purple-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+.hero-tagline{
+  font-size:clamp(1.1rem,2.5vw,1.5rem);
+  color:var(--muted);font-weight:600;margin-bottom:1.5rem;letter-spacing:0.3px;
+}
+.hero-tagline span{color:var(--text)}
+
+.hero-sub{
+  font-size:1.05rem;color:var(--muted);max-width:500px;
+  margin:0 auto 2.5rem;font-weight:500;line-height:1.75;
+}
+.hero-sub strong{color:var(--cyan);font-weight:700}
+
+/* SEARCH */
+.search-box{
+  display:flex;align-items:center;
+  background:var(--card);
+  border:2px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;width:100%;max-width:540px;
+  margin:0 auto 1rem;
+  transition:border-color 0.3s,box-shadow 0.3s;
+}
+.search-box:focus-within{
+  border-color:var(--purple-light);
+  box-shadow:0 0 0 4px rgba(124,92,191,0.15);
+}
+.search-region{
+  background:var(--bg3);border:none;border-right:2px solid var(--border);
+  color:var(--cyan);font-family:var(--font);font-weight:700;font-size:0.82rem;
+  padding:0 1rem;height:52px;cursor:pointer;outline:none;min-width:70px;
+}
+.search-region option{background:var(--bg2)}
+.search-input{
+  flex:1;background:transparent;border:none;color:var(--text);
+  font-family:var(--font);font-size:1rem;font-weight:600;
+  padding:0 1.25rem;height:52px;outline:none;
+}
+.search-input::placeholder{color:var(--muted);font-weight:500}
+.search-btn{
+  background:linear-gradient(135deg,var(--purple),var(--blue));
+  border:none;color:#fff;font-family:var(--font);font-size:0.9rem;
+  font-weight:800;padding:0 1.75rem;height:52px;cursor:pointer;
+  transition:all 0.2s;letter-spacing:0.3px;white-space:nowrap;
+}
+.search-btn:hover{background:linear-gradient(135deg,var(--purple-light),var(--cyan));transform:none}
+.hero-note{font-size:0.8rem;color:var(--muted);font-weight:600}
+.hero-note span{color:var(--green)}
+
+/* TRUST PILLS */
+.trust-pills{display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:center;margin-top:2rem}
+.pill{
+  display:flex;align-items:center;gap:0.4rem;
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:50px;padding:0.35rem 0.85rem;
+  font-size:0.78rem;font-weight:700;color:var(--muted);
+}
+.pill-icon{font-size:0.9rem}
+
+/* ── STATS ── */
+.stats-wrap{
+  background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  position:relative;z-index:1;
+}
+.stats-inner{
+  max-width:900px;margin:0 auto;
+  display:grid;grid-template-columns:repeat(4,1fr);
+}
+.stat{
+  text-align:center;padding:2rem 1.5rem;
+  border-right:1px solid var(--border);
+  transition:background 0.2s;
+}
+.stat:last-child{border-right:none}
+.stat:hover{background:rgba(124,92,191,0.05)}
+.stat-num{
+  font-family:var(--font);font-weight:900;font-size:2rem;
+  display:block;margin-bottom:0.25rem;
+  background:linear-gradient(135deg,var(--cyan),var(--purple-light));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.stat-label{font-size:0.78rem;color:var(--muted);font-weight:600}
+
+/* ── SECTIONS ── */
+.section{padding:5rem 2rem;max-width:1050px;margin:0 auto;position:relative;z-index:1}
+.tag{
+  display:inline-flex;align-items:center;gap:0.4rem;
+  background:rgba(124,92,191,0.12);border:1.5px solid rgba(124,92,191,0.25);
+  color:var(--purple-light);font-size:0.75rem;font-weight:800;
+  letter-spacing:1px;text-transform:uppercase;padding:0.3rem 0.85rem;
+  border-radius:50px;margin-bottom:1.25rem;
+}
+.section-title{
+  font-family:var(--font);font-weight:900;
+  font-size:clamp(1.8rem,4vw,2.8rem);
+  color:var(--text);margin-bottom:0.75rem;letter-spacing:-0.5px;line-height:1.15;
+}
+.section-sub{color:var(--muted);font-size:1rem;max-width:480px;margin-bottom:3rem;font-weight:500;line-height:1.7}
+
+/* ── STEPS ── */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.step{
+  background:var(--card);border:2px solid var(--border);
+  border-radius:20px;padding:2rem 1.75rem;
+  position:relative;overflow:hidden;
+  transition:transform 0.25s,border-color 0.25s,box-shadow 0.25s;
+}
+.step:hover{transform:translateY(-5px);border-color:var(--purple-light);box-shadow:0 12px 30px rgba(124,92,191,0.15)}
+.step-emoji{font-size:2.2rem;margin-bottom:1rem;display:block}
+.step-num{
+  position:absolute;top:1.25rem;right:1.5rem;
+  font-weight:900;font-size:2.5rem;color:rgba(255,255,255,0.04);
+  font-family:var(--font);line-height:1;
+}
+.step-title{font-weight:800;font-size:1.05rem;margin-bottom:0.5rem;color:var(--text)}
+.step-desc{color:var(--muted);font-size:0.9rem;line-height:1.7;font-weight:500}
+.step-badge{
+  display:inline-block;margin-top:1rem;
+  background:rgba(0,212,255,0.1);color:var(--cyan);
+  font-size:0.72rem;font-weight:700;padding:0.25rem 0.65rem;border-radius:50px;
+}
+
+/* ── REPORT PREVIEW ── */
+.preview-section{
+  padding:5rem 2rem;background:var(--bg2);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  position:relative;z-index:1;
+}
+.preview-inner{max-width:1050px;margin:0 auto;display:grid;grid-template-columns:1fr 1.1fr;gap:3.5rem;align-items:center}
+.feat-list{display:flex;flex-direction:column;gap:0.85rem;margin-top:1.5rem}
+.feat{
+  display:flex;align-items:flex-start;gap:0.9rem;
+  background:var(--card);border:2px solid var(--border);
+  border-radius:14px;padding:0.9rem 1.1rem;
+  transition:border-color 0.2s,transform 0.2s;
+}
+.feat:hover{border-color:rgba(124,92,191,0.35);transform:translateX(4px)}
+.feat-emoji{font-size:1.3rem;flex-shrink:0;margin-top:1px}
+.feat-title{font-size:0.9rem;font-weight:800;color:var(--text);margin-bottom:0.15rem}
+.feat-desc{font-size:0.8rem;color:var(--muted);font-weight:500;line-height:1.5}
+
+/* REPORT MOCK */
+.rmock{
+  background:var(--card);border:2px solid var(--border);
+  border-radius:20px;overflow:hidden;
+}
+.rmock-bar{
+  background:var(--bg3);padding:0.7rem 1rem;
+  display:flex;align-items:center;gap:0.5rem;
+  border-bottom:2px solid var(--border);
+}
+.rdot{width:10px;height:10px;border-radius:50%}
+.rdot-r{background:#FF5F57}.rdot-y{background:#FEBC2E}.rdot-g{background:#28C840}
+.rmock-title{font-size:0.75rem;color:var(--muted);font-weight:600;margin-left:0.3rem}
+.rmock-body{padding:1.5rem}
+.rplayer{display:flex;align-items:center;gap:0.9rem;margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)}
+.rp-av{
+  width:42px;height:42px;border-radius:12px;
+  background:linear-gradient(135deg,var(--purple),var(--blue));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:1rem;color:#fff;flex-shrink:0;
+}
+.rp-name{font-size:0.9rem;font-weight:800;color:var(--text)}
+.rp-rank{
+  display:inline-flex;align-items:center;gap:0.3rem;
+  background:rgba(255,184,0,0.1);color:var(--gold);
+  font-size:0.7rem;font-weight:700;padding:0.15rem 0.5rem;
+  border-radius:50px;margin-top:3px;
+}
+.alert-box{
+  background:linear-gradient(135deg,rgba(255,107,157,0.08),rgba(255,184,0,0.06));
+  border:1.5px solid rgba(255,107,157,0.25);
+  border-radius:12px;padding:0.9rem 1rem;margin-bottom:1.1rem;
+}
+.alert-label{font-size:0.65rem;font-weight:800;color:var(--pink);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:0.4rem}
+.alert-text{font-size:0.8rem;color:var(--text);line-height:1.6;font-weight:500}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.8rem}
+.stat-row:last-child{border-bottom:none}
+.sr-l{color:var(--muted);font-weight:500}.sr-v{font-weight:700}
+.sr-v.bad{color:#FF6B6B}.sr-v.good{color:var(--green)}
+.analyze-btn-mock{
+  display:block;width:100%;margin-top:1.25rem;
+  background:linear-gradient(135deg,var(--purple),var(--blue));
+  border:none;border-radius:12px;color:#fff;
+  font-family:var(--font);font-size:0.9rem;font-weight:800;
+  padding:0.75rem;cursor:pointer;text-align:center;
+  box-shadow:0 4px 15px rgba(124,92,191,0.35);
+}
+
+/* ── PRICING ── */
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:2.5rem}
+.pcard{
+  background:var(--card);border:2px solid var(--border);
+  border-radius:20px;padding:2rem;
+  position:relative;transition:transform 0.25s,border-color 0.25s;
+}
+.pcard:hover{transform:translateY(-4px)}
+.pcard.pop{border-color:var(--purple-light);box-shadow:0 8px 30px rgba(124,92,191,0.2)}
+.pop-badge{
+  position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(135deg,var(--purple),var(--blue));
+  color:#fff;font-size:0.72rem;font-weight:800;
+  padding:0.3rem 1rem;border-radius:50px;white-space:nowrap;
+  box-shadow:0 4px 12px rgba(124,92,191,0.4);
+}
+.ptier{font-size:0.75rem;font-weight:800;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:0.75rem}
+.pamount{font-family:var(--font);font-weight:900;font-size:3rem;color:var(--text);line-height:1;margin-bottom:0.25rem;letter-spacing:-1px}
+.pamount span{font-size:1rem;color:var(--muted);font-weight:600}
+.pdesc{font-size:0.85rem;color:var(--muted);margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);line-height:1.6;font-weight:500}
+.pfeats{list-style:none;margin-bottom:1.75rem}
+.pfeats li{font-size:0.88rem;padding:0.3rem 0;display:flex;align-items:center;gap:0.6rem;color:var(--muted);font-weight:500}
+.pfeats li.y{color:var(--text);font-weight:600}
+.pfeats li::before{content:'○';font-size:0.65rem;flex-shrink:0;color:var(--border)}
+.pfeats li.y::before{content:'●';color:var(--green)}
+.pbtn{
+  display:block;width:100%;text-align:center;padding:0.75rem;
+  border-radius:12px;font-family:var(--font);font-size:0.9rem;
+  font-weight:800;cursor:pointer;border:2px solid var(--border);
+  text-decoration:none;transition:all 0.2s;background:transparent;color:var(--text);
+}
+.pbtn:hover{border-color:var(--purple-light);color:var(--purple-light)}
+.pbtn.main{
+  background:linear-gradient(135deg,var(--purple),var(--blue));
+  border-color:transparent;color:#fff;
+  box-shadow:0 4px 15px rgba(124,92,191,0.35);
+}
+.pbtn.main:hover{box-shadow:0 6px 20px rgba(124,92,191,0.5);transform:translateY(-1px)}
+
+/* ── TESTIMONIALS ── */
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:2.5rem}
+.tcard{
+  background:var(--card);border:2px solid var(--border);
+  border-radius:20px;padding:1.5rem;
+  transition:border-color 0.2s,transform 0.2s;
+}
+.tcard:hover{border-color:rgba(124,92,191,0.3);transform:translateY(-3px)}
+.tstars{font-size:0.85rem;color:var(--gold);margin-bottom:0.85rem;letter-spacing:2px}
+.ttext{font-size:0.9rem;color:var(--text);line-height:1.7;margin-bottom:1.25rem;font-weight:500;opacity:0.9}
+.tauth{display:flex;align-items:center;gap:0.75rem}
+.tav{
+  width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:0.7rem;color:#fff;flex-shrink:0;
+}
+.tname{font-size:0.82rem;font-weight:800;color:var(--text)}
+.trank{font-size:0.72rem;color:var(--cyan);font-weight:600}
+
+/* ── CTA ── */
+.cta-wrap{
+  padding:6rem 2rem;text-align:center;position:relative;z-index:1;
+  background:var(--bg2);border-top:1px solid var(--border);
+}
+.cta-emoji{font-size:3.5rem;display:block;margin-bottom:1rem;animation:bounce 2s infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.cta-wrap h2{
+  font-family:var(--font);font-weight:900;
+  font-size:clamp(2.5rem,6vw,4.5rem);
+  letter-spacing:-1.5px;margin-bottom:1rem;line-height:1.1;
+}
+.cta-wrap h2 span{background:linear-gradient(135deg,var(--cyan),var(--purple-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.cta-wrap p{color:var(--muted);font-size:1rem;max-width:420px;margin:0 auto 2.5rem;font-weight:500;line-height:1.7}
+
+/* ── FOOTER ── */
+footer{
+  padding:2rem 2.5rem;background:var(--bg);
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  position:relative;z-index:1;
+}
+.flogo{font-weight:900;font-size:1.1rem;background:linear-gradient(135deg,var(--cyan),var(--purple-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.fnote{font-size:0.75rem;color:var(--muted);font-weight:500}
+
+/* GRADIENT LINE */
+.gline{height:2px;background:linear-gradient(90deg,transparent,var(--purple),var(--cyan),var(--purple),transparent);opacity:0.4;position:relative;z-index:1}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.hero>*{animation:fadeUp 0.6s ease both}
+.hero>*:nth-child(1){animation-delay:0.1s}
+.hero>*:nth-child(2){animation-delay:0.2s}
+.hero>*:nth-child(3){animation-delay:0.3s}
+.hero>*:nth-child(4){animation-delay:0.4s}
+.hero>*:nth-child(5){animation-delay:0.5s}
+.hero>*:nth-child(6){animation-delay:0.6s}
+
+@media(max-width:768px){
+  nav{padding:1rem 1.25rem}nav ul{display:none}
+  .section,.preview-section{padding:4rem 1.25rem}
+  .steps{grid-template-columns:1fr}
+  .preview-inner{grid-template-columns:1fr}
+  .price-grid,.tgrid{grid-template-columns:1fr}
+  .stats-inner{grid-template-columns:repeat(2,1fr)}
+  footer{flex-direction:column;gap:0.75rem;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Fix<em>My</em>Elo</div>
+  <ul>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="coaches.html">Find a Coach 👑</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+    <li><a href="analyze.html" class="nav-btn">Get My Report 🚀</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge"><span class="live-dot"></span> Live · Season 2026 · LoL AI Coach</div>
+
+  <h1>
+    <span class="h1-fix">Fix</span><span class="h1-my">My</span><span class="h1-elo">Elo</span>
+  </h1>
+
+  <p class="hero-tagline">
+    <span>Stop blaming teammates.</span> Start climbing. 📈
+  </p>
+
+  <p class="hero-sub">
+    We scan your last 20 games and find the <strong>one habit</strong> that's secretly costing you LP every single match. No fluff, no dashboards — just your fix. 🎯
+  </p>
+
+  <div class="search-box">
+    <select class="search-region">
+      <option>EUW</option><option>EUNE</option><option>NA</option>
+      <option>KR</option><option>BR</option><option>LAN</option>
+    </select>
+    <input class="search-input" type="text" placeholder="Enter your Summoner Name..."/>
+    <button class="search-btn" onclick="window.location.href='analyze.html'">Analyze Me ⚡</button>
+  </div>
+  <p class="hero-note"><span>✓ Free</span> preview · No sign-up · Results in 60 seconds</p>
+
+  <div class="trust-pills">
+    <div class="pill"><span class="pill-icon">🎮</span> League of Legends</div>
+    <div class="pill"><span class="pill-icon">🤖</span> Powered by AI</div>
+    <div class="pill"><span class="pill-icon">🔒</span> Read-only API</div>
+    <div class="pill"><span class="pill-icon">⚡</span> 60 Second Reports</div>
+  </div>
+</section>
+
+<div class="gline"></div>
+
+<!-- STATS -->
+<div class="stats-wrap">
+  <div class="stats-inner">
+    <div class="stat"><span class="stat-num">14,200+</span><span class="stat-label">Reports Generated</span></div>
+    <div class="stat"><span class="stat-num">1.8 Divs</span><span class="stat-label">Avg Rank Gained</span></div>
+    <div class="stat"><span class="stat-num">93%</span><span class="stat-label">Habit Accuracy</span></div>
+    <div class="stat"><span class="stat-num">&lt;60s</span><span class="stat-label">Report Speed</span></div>
+  </div>
+</div>
+
+<div class="gline"></div>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="tag">✨ How it works</div>
+  <h2 class="section-title">Three steps to your next division 🏆</h2>
+  <p class="section-sub">No downloads, no complicated setup — just enter your name and we do the rest.</p>
+  <div class="steps">
+    <div class="step">
+      <span class="step-emoji">🔍</span>
+      <div class="step-num">01</div>
+      <div class="step-title">Enter your Summoner Name</div>
+      <p class="step-desc">Type your name and pick your region. We pull your last 20 ranked games straight from Riot's API — no login needed, totally safe.</p>
+      <span class="step-badge">Takes 5 seconds</span>
+    </div>
+    <div class="step">
+      <span class="step-emoji">🧠</span>
+      <div class="step-num">02</div>
+      <div class="step-title">AI Scans Your Games</div>
+      <p class="step-desc">Our AI looks at your deaths, trading patterns, positioning, vision score, and objective control across every game to spot your #1 problem.</p>
+      <span class="step-badge">Takes ~45 seconds</span>
+    </div>
+    <div class="step">
+      <span class="step-emoji">🎯</span>
+      <div class="step-num">03</div>
+      <div class="step-title">Get Your Personal Fix</div>
+      <p class="step-desc">You get a clear, honest report: your worst habit, why it's costing you LP, and exactly what to practice to fix it and start climbing.</p>
+      <span class="step-badge">Instant delivery</span>
+    </div>
+  </div>
+</section>
+
+<!-- REPORT PREVIEW -->
+<section class="preview-section">
+  <div class="preview-inner">
+    <div>
+      <div class="tag">📋 Sample report</div>
+      <h2 class="section-title">What you'll actually get 👀</h2>
+      <p class="section-sub">Not random tips from a guide. Your specific habits, backed by your own game data.</p>
+      <div class="feat-list">
+        <div class="feat"><span class="feat-emoji">🎯</span><div><div class="feat-title">Your #1 Habit</div><div class="feat-desc">The exact pattern that's losing you the most LP right now</div></div></div>
+        <div class="feat"><span class="feat-emoji">📊</span><div><div class="feat-title">Data Evidence</div><div class="feat-desc">Real stats from your real games proving the habit exists</div></div></div>
+        <div class="feat"><span class="feat-emoji">🛠️</span><div><div class="feat-title">3-Step Fix Plan</div><div class="feat-desc">Simple drills you can apply in your next game tonight</div></div></div>
+        <div class="feat"><span class="feat-emoji">🏆</span><div><div class="feat-title">Champion Tips</div><div class="feat-desc">Which picks hide your weakness while you improve</div></div></div>
+      </div>
+    </div>
+
+    <div class="rmock">
+      <div class="rmock-bar">
+        <div class="rdot rdot-r"></div><div class="rdot rdot-y"></div><div class="rdot rdot-g"></div>
+        <span class="rmock-title">Your Report — Faker9000 · EUW · Gold II</span>
+      </div>
+      <div class="rmock-body">
+        <div class="rplayer">
+          <div class="rp-av">F9</div>
+          <div>
+            <div class="rp-name">Faker9000</div>
+            <div class="rp-rank">🥇 Gold II · Mid Lane · 20 games scanned</div>
+          </div>
+        </div>
+        <div class="alert-box">
+          <div class="alert-label">⚠️ Your #1 Bad Habit Found</div>
+          <div class="alert-text">You keep fighting at levels 1–3 when you're losing the trade, and you're burning Flash to escape in 73% of your games. Your opponents snowball that free kill advantage into mid game every time.</div>
+        </div>
+        <div class="stat-row"><span class="sr-l">Avg early deaths (pre-6)</span><span class="sr-v bad">2.4 per game 😬</span></div>
+        <div class="stat-row"><span class="sr-l">Flash used before level 6</span><span class="sr-v bad">67% of games</span></div>
+        <div class="stat-row"><span class="sr-l">Win rate when you survive lane</span><span class="sr-v good">71% 🔥</span></div>
+        <div class="stat-row"><span class="sr-l">Estimated LP lost per week</span><span class="sr-v bad">~34 LP 😭</span></div>
+        <div class="analyze-btn-mock">👆 See your full fix plan →</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="section" id="pricing">
+  <div class="tag">💰 Pricing</div>
+  <h2 class="section-title">Simple, honest pricing 🙌</h2>
+  <p class="section-sub">Start for free. No credit card. No sneaky subscriptions.</p>
+  <div class="price-grid">
+    <div class="pcard">
+      <div class="ptier">Free</div>
+      <div class="pamount">€0 <span>/ report</span></div>
+      <p class="pdesc">Try it out and see if we actually know what we're talking about. No payment needed.</p>
+      <ul class="pfeats">
+        <li class="y">Top habit identified</li>
+        <li class="y">Basic stats summary</li>
+        <li>Full 3-step fix plan</li>
+        <li>Champion recommendations</li>
+        <li>Weekly tracking</li>
+      </ul>
+      <button class="pbtn">Try for Free 👀</button>
+    </div>
+
+    <div class="pcard pop">
+      <div class="pop-badge">⭐ Most Popular</div>
+      <div class="ptier">Full Report</div>
+      <div class="pamount">€5 <span>/ report</span></div>
+      <p class="pdesc">The complete breakdown. Everything you need to start climbing right now.</p>
+      <ul class="pfeats">
+        <li class="y">Top habit identified</li>
+        <li class="y">Full stat breakdown</li>
+        <li class="y">Full 3-step fix plan</li>
+        <li class="y">Champion recommendations</li>
+        <li>Weekly tracking</li>
+      </ul>
+      <button class="pbtn main">Get Full Report 🚀</button>
+    </div>
+
+    <div class="pcard">
+      <div class="ptier">Pro Monthly</div>
+      <div class="pamount">€15 <span>/ mo</span></div>
+      <p class="pdesc">For players who are seriously grinding ranked and want to track progress over time.</p>
+      <ul class="pfeats">
+        <li class="y">Everything in Full Report</li>
+        <li class="y">Weekly progress reports</li>
+        <li class="y">Habit tracking over time</li>
+        <li class="y">Champion pool builder</li>
+        <li class="y">Priority queue</li>
+      </ul>
+      <button class="pbtn">Go Pro 📈</button>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<!-- COACHES TEASER -->
+<section style="padding:5rem 2rem;background:linear-gradient(135deg,rgba(255,184,0,0.06),rgba(124,92,191,0.06));border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);position:relative;z-index:1">
+  <div style="max-width:1050px;margin:0 auto;text-align:center">
+    <div style="display:inline-flex;align-items:center;gap:0.5rem;background:rgba(255,184,0,0.1);border:1.5px solid rgba(255,184,0,0.3);color:#FFB800;font-size:0.78rem;font-weight:800;padding:0.35rem 0.9rem;border-radius:50px;margin-bottom:1.25rem">👑 Human Coaching</div>
+    <h2 style="font-family:'Nunito',sans-serif;font-weight:900;font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:0.75rem;letter-spacing:-0.5px">Want a real coach on top of your AI report? 🎮</h2>
+    <p style="color:#8888AA;font-size:1rem;max-width:520px;margin:0 auto 2.5rem;font-weight:500;line-height:1.7">Every coach on FixMyElo is <strong style="color:#fff">Diamond or above</strong>, verified by us, and rated by real students. Book a session and actually climb this season.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2.5rem;max-width:800px;margin-left:auto;margin-right:auto">
+      <div style="background:#1E1E38;border:2px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.25rem;text-align:center">
+        <div style="font-size:1.5rem;margin-bottom:0.5rem">🏆</div>
+        <div style="font-weight:800;font-size:0.9rem;margin-bottom:0.25rem">Diamond to Challenger</div>
+        <div style="font-size:0.78rem;color:#8888AA;font-weight:500">All ranks available</div>
+      </div>
+      <div style="background:#1E1E38;border:2px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.25rem;text-align:center">
+        <div style="font-size:1.5rem;margin-bottom:0.5rem">⭐</div>
+        <div style="font-weight:800;font-size:0.9rem;margin-bottom:0.25rem">4.8 Average Rating</div>
+        <div style="font-size:0.78rem;color:#8888AA;font-weight:500">From 1,200+ sessions</div>
+      </div>
+      <div style="background:#1E1E38;border:2px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.25rem;text-align:center">
+        <div style="font-size:1.5rem;margin-bottom:0.5rem">💰</div>
+        <div style="font-weight:800;font-size:0.9rem;margin-bottom:0.25rem">From €10/hour</div>
+        <div style="font-size:0.78rem;color:#8888AA;font-weight:500">Pay only for results</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="coaches.html" style="display:inline-flex;align-items:center;gap:0.5rem;background:linear-gradient(135deg,#FFB800,#FF9500);color:#000;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:900;padding:0.85rem 2rem;border-radius:50px;text-decoration:none;box-shadow:0 4px 20px rgba(255,184,0,0.35);transition:all 0.2s">Browse Coaches 👑</a>
+      <a href="coaches.html#apply" style="display:inline-flex;align-items:center;gap:0.5rem;background:transparent;color:#FFB800;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;padding:0.85rem 2rem;border-radius:50px;text-decoration:none;border:2px solid rgba(255,184,0,0.4);transition:all 0.2s">Become a Coach 💰</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="reviews" style="padding-top:0">
+  <div class="tag">💬 Reviews</div>
+  <h2 class="section-title">Players who climbed 👇</h2>
+  <p class="section-sub">Real people, real ranks, real results.</p>
+  <div class="tgrid">
+    <div class="tcard">
+      <div class="tstars">★★★★★</div>
+      <p class="ttext">"It told me I was wasting Flash before level 6. I literally didn't believe it until I saw my own stats. Fixed it in a week and went from Gold 3 to Plat 4 😭🙏"</p>
+      <div class="tauth"><div class="tav">DK</div><div><div class="tname">DravenKing99</div><div class="trank">Gold → Platinum · EUW</div></div></div>
+    </div>
+    <div class="tcard">
+      <div class="tstars">★★★★★</div>
+      <p class="ttext">"Every other tool just shows me graphs I don't understand. FixMyElo actually told me WHAT to fix and HOW. That's genuinely different. Super accurate too."</p>
+      <div class="tauth"><div class="tav">SW</div><div><div class="tname">Silverwing</div><div class="trank">Silver → Gold · NA</div></div></div>
+    </div>
+    <div class="tcard">
+      <div class="tstars">★★★★☆</div>
+      <p class="ttext">"Climbed 2 divisions in 3 weeks after following the fix plan. Kinda embarrassing how obvious my habit was once someone pointed it out lmao. Worth it 100%"</p>
+      <div class="tauth"><div class="tav">RX</div><div><div class="tname">Rixora</div><div class="trank">Plat → Emerald · EUW</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-wrap">
+  <span class="cta-emoji">🚀</span>
+  <h2>Ready to <span>actually climb?</span></h2>
+  <p>It's free, it takes 60 seconds, and you might finally find out why you keep losing those close games. 👀</p>
+  <div class="search-box" style="max-width:500px;margin:0 auto">
+    <select class="search-region"><option>EUW</option><option>EUNE</option><option>NA</option><option>KR</option></select>
+    <input class="search-input" type="text" placeholder="Your Summoner Name..."/>
+    <button class="search-btn">Analyze Me ⚡</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="flogo">FixMyElo</div>
+  <div style="display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center">
+    <a href="privacy.html" style="font-size:0.78rem;color:var(--muted);font-weight:600;text-decoration:none">Privacy Policy</a>
+    <a href="terms.html" style="font-size:0.78rem;color:var(--muted);font-weight:600;text-decoration:none">Terms of Service</a>
+    <a href="refunds.html" style="font-size:0.78rem;color:var(--muted);font-weight:600;text-decoration:none">Refund Policy</a>
+    <a href="coaches.html" style="font-size:0.78rem;color:var(--muted);font-weight:600;text-decoration:none">Find a Coach</a>
+  </div>
+  <div class="fnote">© 2026 FixMyElo.com · Cyprus, EU · Not affiliated with Riot Games</div>
+</footer>
+
+<script>
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+let W, H, stars = [], orbs = [];
+
+function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+
+const COLORS = ['#7C5CBF','#4A90E2','#00D4FF','#FFB800','#FF6B9D','#00C896'];
+
+function init(){
+  stars = [];
+  orbs = [];
+  for(let i=0;i<120;i++){
+    stars.push({
+      x:Math.random()*W, y:Math.random()*H,
+      r:Math.random()*1.5+0.3,
+      alpha:Math.random()*0.5+0.1,
+      twinkle:Math.random()*Math.PI*2,
+      twinkleSpeed:Math.random()*0.02+0.005
+    });
+  }
+  for(let i=0;i<6;i++){
+    orbs.push({
+      x:Math.random()*W, y:Math.random()*H,
+      r:Math.random()*180+80,
+      color:COLORS[i%COLORS.length],
+      vx:(Math.random()-0.5)*0.3,
+      vy:(Math.random()-0.5)*0.3,
+      alpha:0.04+Math.random()*0.04
+    });
+  }
+}
+
+let frame=0;
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  frame++;
+
+  // Glowing orbs
+  orbs.forEach(o=>{
+    o.x+=o.vx; o.y+=o.vy;
+    if(o.x<-o.r)o.x=W+o.r;
+    if(o.x>W+o.r)o.x=-o.r;
+    if(o.y<-o.r)o.y=H+o.r;
+    if(o.y>H+o.r)o.y=-o.r;
+    const g=ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r);
+    g.addColorStop(0,o.color+'44');
+    g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;
+    ctx.globalAlpha=1;
+    ctx.beginPath();
+    ctx.arc(o.x,o.y,o.r,0,Math.PI*2);
+    ctx.fill();
+  });
+
+  // Twinkling stars
+  stars.forEach(s=>{
+    s.twinkle+=s.twinkleSpeed;
+    const a=s.alpha*(0.5+0.5*Math.sin(s.twinkle));
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle='#fff';
+    ctx.globalAlpha=a;
+    ctx.fill();
+  });
+
+  ctx.globalAlpha=1;
+  requestAnimationFrame(draw);
+}
+
+window.addEventListener('resize',()=>{resize();init()});
+resize(); init(); draw();
+</script>
+</body>
+</html>
